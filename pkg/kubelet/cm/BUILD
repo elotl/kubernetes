@@ -6,6 +6,7 @@ go_library(
         "cgroup_manager_linux.go",
         "cgroup_manager_unsupported.go",
         "container_manager.go",
+        "container_manager_darwin.go",
         "container_manager_linux.go",
         "container_manager_stub.go",
         "container_manager_unsupported.go",
