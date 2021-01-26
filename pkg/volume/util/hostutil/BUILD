@@ -5,6 +5,7 @@ go_library(
     srcs = [
         "fake_hostutil.go",
         "hostutil.go",
+        "hostutil_darwin.go",
         "hostutil_linux.go",
         "hostutil_unsupported.go",
         "hostutil_windows.go",
