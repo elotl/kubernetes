@@ -9,6 +9,7 @@ load(
 go_library(
     name = "go_default_library",
     srcs = [
+        "cadvisor_darwin.go",
         "cadvisor_linux.go",
         "cadvisor_unsupported.go",
         "cadvisor_windows.go",
@@ -60,6 +61,12 @@ go_library(
         ],
         "@io_bazel_rules_go//go/platform:windows": [
             "//pkg/kubelet/winstats:go_default_library",
+        ],
+        "@io_bazel_rules_go//go/platform:windows": [
+            "//vendor/github.com/shirou/gopsutil/cpu",
+            "//vendor/github.com/shirou/gopsutil/host",
+            "//vendor/github.com/shirou/gopsutil/mem",
+            "//vendor/github.com/shirou/gopsutil/net",
         ],
         "//conditions:default": [],
     }),
