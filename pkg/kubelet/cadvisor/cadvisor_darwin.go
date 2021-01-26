@@ -73,10 +73,12 @@ func (cd *cadvisorDarwin) MachineInfo() (*cadvisorapi.MachineInfo, error) {
 	if err != nil {
 		return nil, err
 	}
-	if len(cpuInfo) < 1 {
-		cpuInfo = []cpu.InfoStat{
-			{},
-		}
+	// Set fallback values.
+	numCores := 1
+	cpuFrequency := uint64(1000 * 1000) // kHz
+	if len(cpuInfo) > 0 {
+		numCores = int(cpuInfo[0].Cores)
+		cpuFrequency = uint64(cpuInfo[0].Mhz * 1000)
 	}
 
 	memInfo, err := mem.VirtualMemory()
@@ -90,8 +92,8 @@ func (cd *cadvisorDarwin) MachineInfo() (*cadvisorapi.MachineInfo, error) {
 	}
 
 	return &cadvisorapi.MachineInfo{
-		NumCores:       len(cpuInfo),
-		CpuFrequency:   uint64(cpuInfo[0].Mhz * 1000),
+		NumCores:       numCores,
+		CpuFrequency:   cpuFrequency,
 		MemoryCapacity: memInfo.Total,
 		MachineID:      hostInfo.Hostname,
 		SystemUUID:     hostInfo.HostID,
