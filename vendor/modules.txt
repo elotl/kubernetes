@@ -659,6 +659,7 @@ github.com/satori/go.uuid
 github.com/seccomp/libseccomp-golang
 # github.com/shirou/gopsutil v0.0.0-20180427012116-c95755e4bcd7 => github.com/shirou/gopsutil v0.0.0-20180427012116-c95755e4bcd7
 github.com/shirou/gopsutil/cpu
+github.com/shirou/gopsutil/disk
 github.com/shirou/gopsutil/host
 github.com/shirou/gopsutil/internal/common
 github.com/shirou/gopsutil/mem

@@ -284,6 +284,7 @@ filegroup(
         "//vendor/github.com/satori/go.uuid:all-srcs",
         "//vendor/github.com/seccomp/libseccomp-golang:all-srcs",
         "//vendor/github.com/shirou/gopsutil/cpu:all-srcs",
+        "//vendor/github.com/shirou/gopsutil/disk:all-srcs",
         "//vendor/github.com/shirou/gopsutil/host:all-srcs",
         "//vendor/github.com/shirou/gopsutil/internal/common:all-srcs",
         "//vendor/github.com/shirou/gopsutil/mem:all-srcs",

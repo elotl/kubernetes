@@ -26,6 +26,7 @@ import (
 	v1 "github.com/google/cadvisor/info/v1"
 	cadvisorapiv2 "github.com/google/cadvisor/info/v2"
 	"github.com/shirou/gopsutil/cpu"
+	"github.com/shirou/gopsutil/disk"
 	"github.com/shirou/gopsutil/host"
 	"github.com/shirou/gopsutil/mem"
 	psnet "github.com/shirou/gopsutil/net"
@@ -38,14 +39,17 @@ type darwinStats struct {
 }
 
 type cadvisorDarwin struct {
-	stats darwinStats
+	rootPath string
+	stats    darwinStats
 }
 
 var _ Interface = new(cadvisorDarwin)
 
 // New creates a new cAdvisor Interface for darwin.
 func New(imageFsInfoProvider ImageFsInfoProvider, rootPath string, cgroupsRoots []string, usingLegacyStats bool) (Interface, error) {
-	return &cadvisorDarwin{}, nil
+	return &cadvisorDarwin{
+		rootPath: rootPath,
+	}, nil
 }
 
 func (cd *cadvisorDarwin) Start() error {
@@ -116,8 +120,7 @@ func (cd *cadvisorDarwin) ImagesFsInfo() (cadvisorapiv2.FsInfo, error) {
 }
 
 func (cd *cadvisorDarwin) RootFsInfo() (cadvisorapiv2.FsInfo, error) {
-	// TODO
-	return cadvisorapiv2.FsInfo{}, nil
+	return cd.GetDirFsInfo(cd.rootPath)
 }
 
 func (cd *cadvisorDarwin) WatchEvents(request *events.Request) (*events.EventChannel, error) {
@@ -125,8 +128,23 @@ func (cd *cadvisorDarwin) WatchEvents(request *events.Request) (*events.EventCha
 }
 
 func (cd *cadvisorDarwin) GetDirFsInfo(path string) (cadvisorapiv2.FsInfo, error) {
-	// TODO
-	return cadvisorapiv2.FsInfo{}, nil
+	fsInfo := cadvisorapiv2.FsInfo{}
+
+	diskUsage, err := disk.Usage(path)
+	if err != nil {
+		return fsInfo, err
+	}
+
+	fsInfo.Timestamp = time.Now()
+	fsInfo.Capacity = uint64(diskUsage.Total)
+	fsInfo.Available = uint64(diskUsage.Free)
+	fsInfo.Usage = uint64(diskUsage.Used)
+	fsInfo.Inodes = &diskUsage.InodesTotal
+	fsInfo.InodesFree = &diskUsage.InodesFree
+
+	klog.Infof("%s %v", path, fsInfo)
+
+	return fsInfo, nil
 }
 
 func containerInfos(stats *darwinStats) (map[string]cadvisorapiv2.ContainerInfo, error) {
