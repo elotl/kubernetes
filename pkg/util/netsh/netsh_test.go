@@ -17,6 +17,7 @@ limitations under the License.
 package netsh
 
 import (
+	"fmt"
 	"net"
 	"os"
 	"testing"
@@ -28,6 +29,13 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+// Fake errors
+var (
+	exit0   = &fakeexec.FakeExitError{Status: 0}
+	exit1   = &fakeexec.FakeExitError{Status: 1}
+	notExit = errors.New("not exit")
+)
+
 func fakeCommonRunner() *runner {
 	fakeCmd := fakeexec.FakeCmd{
 		CombinedOutputScript: []fakeexec.FakeAction{
@@ -37,15 +45,15 @@ func fakeCommonRunner() *runner {
 			},
 			// utilexec.ExitError exists, and status is not 0
 			func() ([]byte, []byte, error) {
-				return nil, nil, &fakeexec.FakeExitError{Status: 1}
+				return nil, nil, exit1
 			},
 			// utilexec.ExitError exists, and status is 0
 			func() ([]byte, []byte, error) {
-				return nil, nil, &fakeexec.FakeExitError{Status: 0}
+				return nil, nil, exit0
 			},
 			// other error exists
 			func() ([]byte, []byte, error) {
-				return nil, nil, errors.New("not ExitError")
+				return nil, nil, notExit
 			},
 		},
 	}
@@ -70,67 +78,13 @@ func fakeCommonRunner() *runner {
 	}
 }
 
-func TestEnsurePortProxyRule(t *testing.T) {
-	runner := fakeCommonRunner()
-
-	tests := []struct {
-		name           string
-		arguments      []string
-		expectedResult bool
-		expectedError  bool
-	}{
-		{"Success", []string{"ensure-port-proxy-rule"}, true, false},
-		{"utilexec.ExitError exists, and status is not 0", []string{"ensure-port-proxy-rule"}, false, false},
-		{"utilexec.ExitError exists, and status is 0", []string{"ensure-port-proxy-rule"}, false, true},
-		{"other error exists", []string{"ensure-port-proxy-rule"}, false, true},
-	}
-
-	for _, test := range tests {
-		result, err := runner.EnsurePortProxyRule(test.arguments)
-		if test.expectedError {
-			assert.Errorf(t, err, "Failed to test: %s", test.name)
-		} else {
-			if err != nil {
-				assert.NoErrorf(t, err, "Failed to test: %s", test.name)
-			} else {
-				assert.EqualValuesf(t, test.expectedResult, result, "Failed to test: %s", test.name)
-			}
-		}
-	}
-
-}
-
-func TestDeletePortProxyRule(t *testing.T) {
-	runner := fakeCommonRunner()
-
-	tests := []struct {
-		name          string
-		arguments     []string
-		expectedError bool
-	}{
-		{"Success", []string{"delete-port-proxy-rule"}, false},
-		{"utilexec.ExitError exists, and status is not 0", []string{"delete-port-proxy-rule"}, true},
-		{"utilexec.ExitError exists, and status is 0", []string{"delete-port-proxy-rule"}, false},
-		{"other error exists", []string{"delete-port-proxy-rule"}, true},
-	}
-
-	for _, test := range tests {
-		err := runner.DeletePortProxyRule(test.arguments)
-		if test.expectedError {
-			assert.Errorf(t, err, "Failed to test: %s", test.name)
-		} else {
-			assert.NoErrorf(t, err, "Failed to test: %s", test.name)
-		}
-	}
-}
-
-func TestEnsureIPAddress(t *testing.T) {
+func TestAddIPAddress(t *testing.T) {
 	tests := []struct {
 		name           string
 		arguments      []string
 		ip             net.IP
 		fakeCmdAction  []fakeexec.FakeCommandAction
-		expectedError  bool
+		expectedError  error
 		expectedResult bool
 	}{
 		{
@@ -149,7 +103,7 @@ func TestEnsureIPAddress(t *testing.T) {
 					}, cmd, args...)
 				},
 			},
-			false,
+			nil,
 			true,
 		},
 
@@ -199,7 +153,7 @@ func TestEnsureIPAddress(t *testing.T) {
 					}, cmd, args...)
 				},
 			},
-			false,
+			nil,
 			true,
 		},
 		{
@@ -222,13 +176,13 @@ func TestEnsureIPAddress(t *testing.T) {
 						CombinedOutputScript: []fakeexec.FakeAction{
 							// Failed to set ip, utilexec.ExitError exists, and status is not 0
 							func() ([]byte, []byte, error) {
-								return nil, nil, &fakeexec.FakeExitError{Status: 1}
+								return nil, nil, exit1
 							},
 						},
 					}, cmd, args...)
 				},
 			},
-			false,
+			nil,
 			false,
 		},
 		{
@@ -251,13 +205,13 @@ func TestEnsureIPAddress(t *testing.T) {
 						CombinedOutputScript: []fakeexec.FakeAction{
 							// Failed to set ip, utilexec.ExitError exists, and status is 0
 							func() ([]byte, []byte, error) {
-								return nil, nil, &fakeexec.FakeExitError{Status: 0}
+								return nil, nil, exit0
 							},
 						},
 					}, cmd, args...)
 				},
 			},
-			true,
+			fmt.Errorf("error adding ipv4 address: exit 0: "),
 			false,
 		},
 		{
@@ -280,27 +234,27 @@ func TestEnsureIPAddress(t *testing.T) {
 						CombinedOutputScript: []fakeexec.FakeAction{
 							// Failed to set ip, other error exists
 							func() ([]byte, []byte, error) {
-								return nil, nil, errors.New("not ExitError")
+								return nil, nil, notExit
 							},
 						},
 					}, cmd, args...)
 				},
 			},
-			true,
+			fmt.Errorf("error adding ipv4 address: not exit: "),
 			false,
 		},
 	}
 
 	for _, test := range tests {
 		runner := New(&fakeexec.FakeExec{CommandScript: test.fakeCmdAction})
-		result, err := runner.EnsureIPAddress(test.arguments, test.ip)
-		if test.expectedError {
-			assert.Errorf(t, err, "Failed to test: %s", test.name)
+		result, err := runner.AddIPAddress(test.ip)
+		if test.expectedError != nil {
+			assert.Equal(t, test.expectedError, err)
 		} else {
 			if err != nil {
-				assert.NoErrorf(t, err, "Failed to test: %s", test.name)
+				assert.NoError(t, err)
 			} else {
-				assert.EqualValuesf(t, test.expectedResult, result, "Failed to test: %s", test.name)
+				assert.EqualValues(t, test.expectedResult, result)
 			}
 		}
 	}
@@ -308,29 +262,30 @@ func TestEnsureIPAddress(t *testing.T) {
 
 func TestDeleteIPAddress(t *testing.T) {
 	runner := fakeCommonRunner()
+	ip := net.ParseIP("1.2.3.4")
 
 	tests := []struct {
 		name          string
-		arguments     []string
-		expectedError bool
+		expectedError error
 	}{
-		{"Success", []string{"delete-ip-address"}, false},
-		{"utilexec.ExitError exists, and status is not 0", []string{"delete-ip-address"}, true},
-		{"utilexec.ExitError exists, and status is 0", []string{"delete-ip-address"}, false},
-		{"other error exists", []string{"delete-ip-address"}, true},
+		{"Success", nil},
+		{
+			name:          "utilexec.ExitError exists, and status is not 0",
+			expectedError: fmt.Errorf("error deleting ipv4 address: exit 1: "),
+		},
+		{"utilexec.ExitError exists, and status is 0", nil},
+		{
+			name:          "other error exists",
+			expectedError: fmt.Errorf("error deleting ipv4 address: not exit: "),
+		},
 	}
 
 	for _, test := range tests {
-		err := runner.DeleteIPAddress(test.arguments)
-		if test.expectedError {
-			assert.Errorf(t, err, "Failed to test: %s", test.name)
-		} else {
-			assert.NoErrorf(t, err, "Failed to test: %s", test.name)
-		}
+		assert.Equal(t, test.expectedError, runner.DeleteIPAddress(ip))
 	}
 }
 
-func TestGetInterfaceToAddIP(t *testing.T) {
+func TestGetInterfaceForIP(t *testing.T) {
 	// backup env 'INTERFACE_TO_ADD_SERVICE_IP'
 	backupValue := os.Getenv("INTERFACE_TO_ADD_SERVICE_IP")
 	// recover env
@@ -348,23 +303,14 @@ func TestGetInterfaceToAddIP(t *testing.T) {
 	fakeExec := fakeexec.FakeExec{
 		CommandScript: []fakeexec.FakeCommandAction{},
 	}
-	netsh := New(&fakeExec)
+	netsh := runner{&fakeExec}
 
 	for _, test := range tests {
 		os.Setenv("INTERFACE_TO_ADD_SERVICE_IP", test.envToBeSet)
-		result := netsh.GetInterfaceToAddIP()
+		result := netsh.getInterfaceForIP()
 
 		assert.EqualValuesf(t, test.expectedResult, result, "Failed to test: %s", test.name)
 	}
-}
-
-func TestRestore(t *testing.T) {
-	runner := New(&fakeexec.FakeExec{
-		CommandScript: []fakeexec.FakeCommandAction{},
-	})
-
-	result := runner.Restore([]string{})
-	assert.NoErrorf(t, result, "The return value must be nil")
 }
 
 func TestCheckIPExists(t *testing.T) {

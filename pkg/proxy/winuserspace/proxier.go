@@ -213,8 +213,7 @@ func (proxier *Proxier) addServicePortPortal(servicePortPortalName ServicePortPo
 			return nil, fmt.Errorf("could not parse ip '%q'", listenIP)
 		}
 		// add the IP address.  Node port binds to all interfaces.
-		args := proxier.netshIPv4AddressAddArgs(serviceIP)
-		if existed, err := proxier.netsh.EnsureIPAddress(args, serviceIP); err != nil {
+		if existed, err := proxier.netsh.AddIPAddress(serviceIP); err != nil {
 			return nil, err
 		} else if !existed {
 			klog.V(3).InfoS("Added ip address to fowarder interface for service", "servicePortPortalName", servicePortPortalName.String(), "addr", net.JoinHostPort(listenIP, strconv.Itoa(port)), "protocol", protocol)
@@ -262,8 +261,7 @@ func (proxier *Proxier) closeServicePortPortal(servicePortPortalName ServicePort
 	// close the PortalProxy by deleting the service IP address
 	if info.portal.ip != allAvailableInterfaces {
 		serviceIP := net.ParseIP(info.portal.ip)
-		args := proxier.netshIPv4AddressDeleteArgs(serviceIP)
-		if err := proxier.netsh.DeleteIPAddress(args); err != nil {
+		if err := proxier.netsh.DeleteIPAddress(serviceIP); err != nil {
 			return err
 		}
 	}
@@ -472,26 +470,4 @@ func isClosedError(err error) bool {
 	// https://code.google.com/p/go/issues/detail?id=4373#c14
 	// TODO: maybe create a stoppable TCP listener that returns a StoppedError
 	return strings.HasSuffix(err.Error(), "use of closed network connection")
-}
-
-func (proxier *Proxier) netshIPv4AddressAddArgs(destIP net.IP) []string {
-	intName := proxier.netsh.GetInterfaceToAddIP()
-	args := []string{
-		"interface", "ipv4", "add", "address",
-		"name=" + intName,
-		"address=" + destIP.String(),
-	}
-
-	return args
-}
-
-func (proxier *Proxier) netshIPv4AddressDeleteArgs(destIP net.IP) []string {
-	intName := proxier.netsh.GetInterfaceToAddIP()
-	args := []string{
-		"interface", "ipv4", "delete", "address",
-		"name=" + intName,
-		"address=" + destIP.String(),
-	}
-
-	return args
 }
