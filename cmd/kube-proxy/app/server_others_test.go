@@ -1,4 +1,4 @@
-// +build !windows
+// +build !windows,!darwin
 
 /*
 Copyright 2018 The Kubernetes Authors.

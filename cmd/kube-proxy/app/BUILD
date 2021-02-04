@@ -15,6 +15,7 @@ go_library(
         "server.go",
         "server_others.go",
         "server_windows.go",
+        "server_darwin.go",
     ],
     importpath = "k8s.io/kubernetes/cmd/kube-proxy/app",
     deps = [
