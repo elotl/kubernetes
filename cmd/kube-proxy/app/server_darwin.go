@@ -102,13 +102,12 @@ func newProxyServer(config *proxyconfigapi.KubeProxyConfiguration, cleanupAndExi
 	klog.V(0).Info("Using userspace Proxier.")
 	execer := exec.New()
 	// XXX: this needs to change to use the macosx command
-	var netshInterface utilnetsh.Interface
-	netshInterface = utilnetsh.New(execer)
+	var netif = utilnetsh.NewIfconfigDarwin(execer)
 
 	proxier, err = winuserspace.NewProxier(
 		winuserspace.NewLoadBalancerRR(),
 		net.ParseIP(config.BindAddress),
-		netshInterface,
+		netif,
 		*utilnet.ParsePortRangeOrDie(config.PortRange),
 		// TODO @pires replace below with default values, if applicable
 		config.IPTables.SyncPeriod.Duration,

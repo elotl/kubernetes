@@ -43,6 +43,7 @@ func (r *ifConfigDarwinRunner) AddIPAddress(ip net.IP) (bool, error) {
 		return false, err
 	}
 	var args = []string{"ifconfig", ifName, "alias", ip.String()}
+	// XXX Is Run enough to ensure there was no error? ie exit = 0
 	err = r.exec.Command(cmdIfconfig, args...).Run()
 	if err != nil {
 		// XXX: This needs works. Check the exit code and the output maybe.
@@ -65,6 +66,7 @@ func (r *ifConfigDarwinRunner) DeleteIPAddress(ip net.IP) error {
 	}
 
 	var args = []string{"ifconfig", ifName, "-alias", ip.String()}
+	// XXX Is Run enough to ensure there was no error? ie exit = 0
 	err = r.exec.Command(cmdIfconfig, args...).Run()
 	if err != nil {
 		return err

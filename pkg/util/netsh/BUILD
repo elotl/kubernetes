@@ -30,7 +30,6 @@ filegroup(
     name = "all-srcs",
     srcs = [
         ":package-srcs",
-        "//pkg/util/netsh/testing:all-srcs",
     ],
     tags = ["automanaged"],
 )
