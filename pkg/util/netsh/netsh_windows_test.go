@@ -307,7 +307,7 @@ func TestGetInterfaceForIP(t *testing.T) {
 
 	for _, test := range tests {
 		os.Setenv("INTERFACE_TO_ADD_SERVICE_IP", test.envToBeSet)
-		result := netsh.getInterfaceForIP()
+		result := netsh.getInterfaceToAddIP()
 
 		assert.EqualValuesf(t, test.expectedResult, result, "Failed to test: %s", test.name)
 	}

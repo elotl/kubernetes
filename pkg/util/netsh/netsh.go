@@ -19,7 +19,7 @@ package netsh
 import "net"
 
 // Provides a way to add and delete virtual IP addresses to the system’s interfaces.
-type NetworkInterface interface {
+type Interface interface {
 	// Add IP address to the appropriate system interface. Does nothing if the
 	// address is already assigned.
 	AddIPAddress(net.IP) (bool, error)

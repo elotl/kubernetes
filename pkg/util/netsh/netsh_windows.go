@@ -1,4 +1,3 @@
-// +build windows
 package netsh
 
 import (
@@ -21,8 +20,8 @@ type runner struct {
 	exec utilexec.Interface
 }
 
-// New returns a new Interface which will exec netsh.
-func New(exec utilexec.Interface) Interface {
+// Returns a new implementation of Interface to execute the Windows interface management tool: netsh.
+func NewWindows(exec utilexec.Interface) Interface {
 	runner := &runner{
 		exec: exec,
 	}
@@ -33,22 +32,16 @@ func New(exec utilexec.Interface) Interface {
 func (runner *runner) AddIPAddress(ip net.IP) (bool, error) {
 	// Check if the ip address exists
 	intName := runner.getInterfaceToAddIP()
-	argsShowAddress := []string{
-		"interface", "ipv4", "show", "address",
-		"name=" + intName,
-	}
-
 	ipToCheck := ip.String()
 
-	exists, _ := checkIPExists(ipToCheck, argsShowAddress, runner)
+	exists, _ := checkIPExists(ipToCheck, intName, runner)
 	if exists == true {
 		klog.V(4).Infof("not adding IP address %q as it already exists", ipToCheck)
 		return true, nil
 	}
 
 	var args = []string{
-		"interface", "ipv4", "add", "address",
-		"name=" + intName,
+		"interface", "ipv4", "add", "address", "name=" + intName,
 		"address=" + ip.String(),
 	}
 	// IP Address is not already added, add it now
@@ -62,7 +55,7 @@ func (runner *runner) AddIPAddress(ip net.IP) (bool, error) {
 		// querying net.InterfaceAddrs() as it returns the IP address as soon as it is added even though it is uninitialized
 		klog.V(3).Infof("Waiting until IP: %v is added to the network adapter", ipToCheck)
 		for {
-			if exists, _ := checkIPExists(ipToCheck, argsShowAddress, runner); exists {
+			if exists, _ := checkIPExists(ipToCheck, intName, runner); exists {
 				return true, nil
 			}
 			time.Sleep(500 * time.Millisecond)
@@ -113,7 +106,10 @@ func (runner *runner) getInterfaceToAddIP() string {
 }
 
 // checkIPExists checks if an IP address exists in 'netsh interface ipv4 show address' output
-func checkIPExists(ipToCheck string, args []string, runner *runner) (bool, error) {
+func checkIPExists(ipToCheck string, interfaceName string, runner *runner) (bool, error) {
+	args := []string{
+		"interface", "ipv4", "show", "address", "name=" + interfaceName,
+	}
 	ipAddress, err := runner.exec.Command(cmdNetsh, args...).CombinedOutput()
 	if err != nil {
 		return false, err
