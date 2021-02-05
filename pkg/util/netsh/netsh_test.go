@@ -246,7 +246,7 @@ func TestAddIPAddress(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		runner := New(&fakeexec.FakeExec{CommandScript: test.fakeCmdAction})
+		runner := NewNetsh(&fakeexec.FakeExec{CommandScript: test.fakeCmdAction})
 		result, err := runner.AddIPAddress(test.ip)
 		if test.expectedError != nil {
 			assert.Equal(t, test.expectedError, err)
@@ -364,19 +364,19 @@ func TestCheckIPExists(t *testing.T) {
 	tests := []struct {
 		name           string
 		ipToCheck      string
-		arguments      []string
+		interfaceName  string
 		expectedError  bool
 		expectedResult bool
 	}{
-		{"Error exists", "10.10.10.20", []string{"check-IP-exists"}, true, false},
-		{"IP address string is empty", "10.10.10.20", []string{"check-IP-exists"}, false, false},
-		{"'IP Address:' field not exists", "10.10.10.20", []string{"check-IP-exists"}, false, false},
-		{"IP not exists", "10.10.10.20", []string{"check-IP-exists"}, false, false},
-		{"IP exists", "10.10.10.20", []string{"check-IP-exists"}, false, true},
+		{"Error exists", "10.10.10.20", "virtual0", true, false},
+		{"IP address string is empty", "10.10.10.20", "virtual0", false, false},
+		{"'IP Address:' field not exists", "10.10.10.20", "virtual0", false, false},
+		{"IP not exists", "10.10.10.20", "virtual0", false, false},
+		{"IP exists", "10.10.10.20", "virtual0", false, true},
 	}
 
 	for _, test := range tests {
-		result, err := checkIPExists(test.ipToCheck, test.arguments, fakeRunner)
+		result, err := fakeRunner.CheckIPExists(test.ipToCheck, test.interfaceName)
 		if test.expectedError {
 			assert.Errorf(t, err, "Failed to test: %s", test.name)
 		} else {
