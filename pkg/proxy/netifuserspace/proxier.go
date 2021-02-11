@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package winuserspace
+package netifuserspace
 
 import (
 	"fmt"
@@ -83,7 +83,7 @@ func logTimeout(err error) bool {
 type Proxier struct {
 	// EndpointSlice support has not been added for this proxier yet.
 	config.NoopEndpointSliceHandler
-	// TODO(imroc): implement node handler for winuserspace proxier.
+	// TODO(imroc): implement node handler for netifuserspace proxier.
 	config.NoopNodeHandler
 
 	loadBalancer   LoadBalancer

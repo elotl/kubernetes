@@ -41,7 +41,7 @@ import (
 	proxyconfigapi "k8s.io/kubernetes/pkg/proxy/apis/config"
 	proxyconfigscheme "k8s.io/kubernetes/pkg/proxy/apis/config/scheme"
 	"k8s.io/kubernetes/pkg/proxy/healthcheck"
-	"k8s.io/kubernetes/pkg/proxy/winuserspace"
+	"k8s.io/kubernetes/pkg/proxy/netifuserspace"
 	"k8s.io/kubernetes/pkg/util/netifcmd"
 	utilnode "k8s.io/kubernetes/pkg/util/node"
 	"k8s.io/utils/exec"
@@ -104,8 +104,8 @@ func newProxyServer(config *proxyconfigapi.KubeProxyConfiguration, cleanupAndExi
 	// XXX: this needs to change to use the macosx command
 	var netif = netifcmd.NewIfconfigDarwin(execer)
 
-	proxier, err = winuserspace.NewProxier(
-		winuserspace.NewLoadBalancerRR(),
+	proxier, err = netifuserspace.NewProxier(
+		netifuserspace.NewLoadBalancerRR(),
 		net.ParseIP(config.BindAddress),
 		netif,
 		*utilnet.ParsePortRangeOrDie(config.PortRange),

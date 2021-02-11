@@ -42,7 +42,7 @@ import (
 	proxyconfigscheme "k8s.io/kubernetes/pkg/proxy/apis/config/scheme"
 	"k8s.io/kubernetes/pkg/proxy/healthcheck"
 	"k8s.io/kubernetes/pkg/proxy/winkernel"
-	"k8s.io/kubernetes/pkg/proxy/winuserspace"
+	"k8s.io/kubernetes/pkg/proxy/netifuserspace"
 	"k8s.io/kubernetes/pkg/util/netifcmd"
 	utilnode "k8s.io/kubernetes/pkg/util/node"
 	"k8s.io/utils/exec"
@@ -146,8 +146,8 @@ func newProxyServer(config *proxyconfigapi.KubeProxyConfiguration, cleanupAndExi
 		var netInterface netifcmd.Interface
 		netInterface = netifcmd.New(execer)
 
-		proxier, err = winuserspace.NewProxier(
-			winuserspace.NewLoadBalancerRR(),
+		proxier, err = netifuserspace.NewProxier(
+			netifuserspace.NewLoadBalancerRR(),
 			net.ParseIP(config.BindAddress),
 			netInterface,
 			*utilnet.ParsePortRangeOrDie(config.PortRange),
