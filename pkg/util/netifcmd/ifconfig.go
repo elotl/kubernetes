@@ -1,4 +1,4 @@
-package netsh
+package netifcmd
 
 import (
 	"net"
@@ -23,7 +23,7 @@ type ifConfigDarwinRunner struct {
 // Ensure ifConfigDarwinRunner implements Interface
 var _ Interface = &ifConfigDarwinRunner{}
 
-// Returns a new implementation of Interface to execute the Darwin interface management tool: netsh.
+// Returns a new implementation of Interface to execute the Darwin interface management tool: ifconfig.
 // Uses the interface defined in INTERFACE_TO_ADD_SERVICE_IP environment variable, if this value is empty uses the interface en0.
 func NewIfconfigDarwin(exec utilexec.Interface) Interface {
 	runner := &ifConfigDarwinRunner{

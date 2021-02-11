@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package netsh
+package netifcmd
 
 import (
 	"fmt"
@@ -303,11 +303,11 @@ func TestGetInterfaceForIP(t *testing.T) {
 	fakeExec := fakeexec.FakeExec{
 		CommandScript: []fakeexec.FakeCommandAction{},
 	}
-	netsh := runner{&fakeExec}
+	netifcmd := runner{&fakeExec}
 
 	for _, test := range tests {
 		os.Setenv("INTERFACE_TO_ADD_SERVICE_IP", test.envToBeSet)
-		result := netsh.getInterfaceToAddIP()
+		result := netifcmd.getInterfaceToAddIP()
 
 		assert.EqualValuesf(t, test.expectedResult, result, "Failed to test: %s", test.name)
 	}

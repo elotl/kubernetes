@@ -34,7 +34,7 @@ import (
 	"k8s.io/kubernetes/pkg/apis/core/v1/helper"
 	"k8s.io/kubernetes/pkg/proxy"
 	"k8s.io/kubernetes/pkg/proxy/config"
-	"k8s.io/kubernetes/pkg/util/netsh"
+	"k8s.io/kubernetes/pkg/util/netifcmd"
 )
 
 const allAvailableInterfaces string = ""
@@ -92,7 +92,7 @@ type Proxier struct {
 	syncPeriod     time.Duration
 	udpIdleTimeout time.Duration
 	numProxyLoops  int32 // use atomic ops to access this; mostly for testing
-	netsh          netsh.Interface
+	netifcmd       netifcmd.Interface
 	hostIP         net.IP
 }
 
@@ -114,7 +114,7 @@ var localhostIPv6 = net.ParseIP("::1")
 // which to listen. It is assumed that there is only a single Proxier active
 // on a machine. An error will be returned if the proxier cannot be started
 // due to an invalid ListenIP (loopback)
-func NewProxier(loadBalancer LoadBalancer, listenIP net.IP, netsh netsh.Interface, pr utilnet.PortRange, syncPeriod, udpIdleTimeout time.Duration) (*Proxier, error) {
+func NewProxier(loadBalancer LoadBalancer, listenIP net.IP, netifcmd netifcmd.Interface, pr utilnet.PortRange, syncPeriod, udpIdleTimeout time.Duration) (*Proxier, error) {
 	if listenIP.Equal(localhostIPv4) || listenIP.Equal(localhostIPv6) {
 		return nil, ErrProxyOnLocalhost
 	}
@@ -125,16 +125,16 @@ func NewProxier(loadBalancer LoadBalancer, listenIP net.IP, netsh netsh.Interfac
 	}
 
 	klog.V(2).InfoS("Setting proxy", "ip", hostIP)
-	return createProxier(loadBalancer, listenIP, netsh, hostIP, syncPeriod, udpIdleTimeout)
+	return createProxier(loadBalancer, listenIP, netifcmd, hostIP, syncPeriod, udpIdleTimeout)
 }
 
-func createProxier(loadBalancer LoadBalancer, listenIP net.IP, netsh netsh.Interface, hostIP net.IP, syncPeriod, udpIdleTimeout time.Duration) (*Proxier, error) {
+func createProxier(loadBalancer LoadBalancer, listenIP net.IP, netifcmd netifcmd.Interface, hostIP net.IP, syncPeriod, udpIdleTimeout time.Duration) (*Proxier, error) {
 	return &Proxier{
 		loadBalancer:   loadBalancer,
 		serviceMap:     make(map[ServicePortPortalName]*serviceInfo),
 		syncPeriod:     syncPeriod,
 		udpIdleTimeout: udpIdleTimeout,
-		netsh:          netsh,
+		netifcmd:       netifcmd,
 		hostIP:         hostIP,
 	}, nil
 }
@@ -213,7 +213,7 @@ func (proxier *Proxier) addServicePortPortal(servicePortPortalName ServicePortPo
 			return nil, fmt.Errorf("could not parse ip '%q'", listenIP)
 		}
 		// add the IP address.  Node port binds to all interfaces.
-		if existed, err := proxier.netsh.AddIPAddress(serviceIP); err != nil {
+		if existed, err := proxier.netifcmd.EnsureIPAddress(serviceIP); err != nil {
 			return nil, err
 		} else if !existed {
 			klog.V(3).InfoS("Added ip address to fowarder interface for service", "servicePortPortalName", servicePortPortalName.String(), "addr", net.JoinHostPort(listenIP, strconv.Itoa(port)), "protocol", protocol)
@@ -261,7 +261,7 @@ func (proxier *Proxier) closeServicePortPortal(servicePortPortalName ServicePort
 	// close the PortalProxy by deleting the service IP address
 	if info.portal.ip != allAvailableInterfaces {
 		serviceIP := net.ParseIP(info.portal.ip)
-		if err := proxier.netsh.DeleteIPAddress(serviceIP); err != nil {
+		if err := proxier.netifcmd.DeleteIPAddress(serviceIP); err != nil {
 			return err
 		}
 	}

@@ -43,7 +43,7 @@ import (
 	"k8s.io/kubernetes/pkg/proxy/healthcheck"
 	"k8s.io/kubernetes/pkg/proxy/winkernel"
 	"k8s.io/kubernetes/pkg/proxy/winuserspace"
-	utilnetsh "k8s.io/kubernetes/pkg/util/netsh"
+	"k8s.io/kubernetes/pkg/util/netifcmd"
 	utilnode "k8s.io/kubernetes/pkg/util/node"
 	"k8s.io/utils/exec"
 	utilsnet "k8s.io/utils/net"
@@ -143,13 +143,13 @@ func newProxyServer(config *proxyconfigapi.KubeProxyConfiguration, cleanupAndExi
 	} else {
 		klog.V(0).Info("Using userspace Proxier.")
 		execer := exec.New()
-		var netshInterface utilnetsh.Interface
-		netshInterface = utilnetsh.New(execer)
+		var netInterface netifcmd.Interface
+		netInterface = netifcmd.New(execer)
 
 		proxier, err = winuserspace.NewProxier(
 			winuserspace.NewLoadBalancerRR(),
 			net.ParseIP(config.BindAddress),
-			netshInterface,
+			netInterface,
 			*utilnet.ParsePortRangeOrDie(config.PortRange),
 			// TODO @pires replace below with default values, if applicable
 			config.IPTables.SyncPeriod.Duration,

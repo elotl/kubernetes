@@ -29,7 +29,7 @@ filegroup(
         "//pkg/util/ipvs:all-srcs",
         "//pkg/util/labels:all-srcs",
         "//pkg/util/maps:all-srcs",
-        "//pkg/util/netsh:all-srcs",
+        "//pkg/util/netifcmd:all-srcs",
         "//pkg/util/node:all-srcs",
         "//pkg/util/oom:all-srcs",
         "//pkg/util/parsers:all-srcs",

@@ -19,7 +19,7 @@ package testing
 import (
 	"net"
 
-	"k8s.io/kubernetes/pkg/util/netsh"
+	"k8s.io/kubernetes/pkg/util/netifcmd"
 )
 
 // FakeNetsh is a no-op implementation of the netsh Interface
@@ -32,7 +32,7 @@ func NewFake() *FakeNetsh {
 }
 
 // EnsureIPAddress checks if the specified IP Address is added to vEthernet (HNSTransparent) interface, if not, add it.  If the address existed, return true.
-func (*FakeNetsh) AddIPAddress(_ net.IP) (bool, error) {
+func (*FakeNetsh) EnsureIPAddress(_ net.IP) (bool, error) {
 	return true, nil
 }
 
@@ -42,4 +42,4 @@ func (*FakeNetsh) DeleteIPAddress(_ net.IP) error {
 	return nil
 }
 
-var _ = netsh.Interface(&FakeNetsh{})
+var _ = netifcmd.Interface(&FakeNetsh{})

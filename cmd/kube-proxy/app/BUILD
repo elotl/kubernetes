@@ -249,7 +249,7 @@ go_library(
         "@io_bazel_rules_go//go/platform:windows": [
             "//pkg/proxy/winkernel:go_default_library",
             "//pkg/proxy/winuserspace:go_default_library",
-            "//pkg/util/netsh:go_default_library",
+            "//pkg/util/netifcmd:go_default_library",
             "//pkg/util/node:go_default_library",
             "//pkg/windows/service:go_default_library",
             "//staging/src/k8s.io/apimachinery/pkg/types:go_default_library",
