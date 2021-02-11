@@ -247,7 +247,7 @@ func TestAddIPAddress(t *testing.T) {
 
 	for _, test := range tests {
 		runner := NewNetsh(&fakeexec.FakeExec{CommandScript: test.fakeCmdAction})
-		result, err := runner.AddIPAddress(test.ip)
+		result, err := runner.EnsureIPAddress(test.ip)
 		if test.expectedError != nil {
 			assert.Equal(t, test.expectedError, err)
 		} else {

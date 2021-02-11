@@ -29,7 +29,7 @@ func NewNetsh(exec utilexec.Interface) Interface {
 }
 
 // EnsureIPAddress checks if the specified IP Address is added to interface identified by Environment variable INTERFACE_TO_ADD_SERVICE_IP, if not, add it.  If the address existed, return true.
-func (runner *runner) AddIPAddress(ip net.IP) (bool, error) {
+func (runner *runner) EnsureIPAddress(ip net.IP) (bool, error) {
 	// Check if the ip address exists
 	intName := runner.getInterfaceToAddIP()
 	ipToCheck := ip.String()

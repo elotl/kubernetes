@@ -22,7 +22,7 @@ import "net"
 type Interface interface {
 	// Add IP address to the appropriate system interface. Does nothing if the
 	// address is already assigned.
-	AddIPAddress(net.IP) (bool, error)
+	EnsureIPAddress(net.IP) (bool, error)
 	// Delete IP address from the system’s interfaces.
 	// XXX: what happens if the IP address isn’t assigned???
 	DeleteIPAddress(net.IP) error

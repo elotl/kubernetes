@@ -33,7 +33,7 @@ func NewIfconfigDarwin(exec utilexec.Interface) Interface {
 	return runner
 }
 
-func (r *ifConfigDarwinRunner) AddIPAddress(ip net.IP) (bool, error) {
+func (r *ifConfigDarwinRunner) EnsureIPAddress(ip net.IP) (bool, error) {
 	var ifName = r.getInterfaceToAddIP()
 	var found, err = CheckIPExists(ifName, ip)
 	if found {
