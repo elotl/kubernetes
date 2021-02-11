@@ -42,10 +42,10 @@ func (r *ifConfigDarwinRunner) EnsureIPAddress(ip net.IP) (bool, error) {
 	if err != nil || found == true {
 		return false, err
 	}
-	var args = []string{"ifconfig", ifName, "alias", ip.String()}
-	// XXX Is Run enough to ensure there was no error? ie exit = 0
-	err = r.exec.Command(cmdIfconfig, args...).Run()
+	var args = []string{ifName, "alias", ip.String()}
+	output, err := r.exec.Command(cmdIfconfig, args...).CombinedOutput()
 	if err != nil {
+		klog.V(3).Infof("ifconfig error:\n%s", string(output))
 		// XXX: This needs works. Check the exit code and the output maybe.
 		// What happens if the ip is already attached (race condition)?
 		// What happens if there’s another error?
@@ -65,10 +65,10 @@ func (r *ifConfigDarwinRunner) DeleteIPAddress(ip net.IP) error {
 		return nil
 	}
 
-	var args = []string{"ifconfig", ifName, "-alias", ip.String()}
-	// XXX Is Run enough to ensure there was no error? ie exit = 0
-	err = r.exec.Command(cmdIfconfig, args...).Run()
+	var args = []string{ifName, "-alias", ip.String()}
+	output, err := r.exec.Command(cmdIfconfig, args...).CombinedOutput()
 	if err != nil {
+		klog.V(3).Infof("ifconfig error:\n%s", string(output))
 		return err
 	}
 	return nil
