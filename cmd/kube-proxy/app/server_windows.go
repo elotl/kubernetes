@@ -144,7 +144,7 @@ func newProxyServer(config *proxyconfigapi.KubeProxyConfiguration, cleanupAndExi
 		klog.V(0).Info("Using userspace Proxier.")
 		execer := exec.New()
 		var netInterface netifcmd.Interface
-		netInterface = netifcmd.New(execer)
+		netInterface = netifcmd.NewNetsh(execer)
 
 		proxier, err = netifuserspace.NewProxier(
 			netifuserspace.NewLoadBalancerRR(),
