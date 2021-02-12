@@ -10,6 +10,7 @@ import (
 
 const (
 	cmdIfconfig string = "ifconfig"
+	cmdSysctl   string = "sysctl"
 )
 
 // runner implements Interface in terms of exec("ifconfig").
@@ -25,12 +26,18 @@ var _ Interface = &ifConfigDarwinRunner{}
 
 // Returns a new implementation of Interface to execute the Darwin interface management tool: ifconfig.
 // Uses the interface defined in INTERFACE_TO_ADD_SERVICE_IP environment variable, if this value is empty uses the interface en0.
-func NewIfconfigDarwin(exec utilexec.Interface) Interface {
+func NewIfconfigDarwin(exec utilexec.Interface) (Interface, error) {
+	var ipForwardingEnableArgs = []string{"-w", "net.inet.ip.forwarding=1"}
+	output, err := exec.Command(cmdSysctl, ipForwardingEnableArgs...).CombinedOutput()
+	if err != nil {
+		klog.V(3).Infof("sysctl error:\n%s", string(output))
+		return nil, err
+	}
 	runner := &ifConfigDarwinRunner{
 		exec:          exec,
 		checkIPExists: CheckIPExists,
 	}
-	return runner
+	return runner, nil
 }
 
 func (r *ifConfigDarwinRunner) EnsureIPAddress(ip net.IP) (bool, error) {

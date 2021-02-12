@@ -101,8 +101,10 @@ func newProxyServer(config *proxyconfigapi.KubeProxyConfiguration, cleanupAndExi
 
 	klog.V(0).Info("Using userspace Proxier.")
 	execer := exec.New()
-	// XXX: this needs to change to use the macosx command
-	var netif = netifcmd.NewIfconfigDarwin(execer)
+	netif, err := netifcmd.NewIfconfigDarwin(execer)
+	if err != nil {
+		return nil, err
+	}
 
 	proxier, err = netifuserspace.NewProxier(
 		netifuserspace.NewLoadBalancerRR(),
