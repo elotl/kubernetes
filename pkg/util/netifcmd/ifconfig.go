@@ -100,7 +100,12 @@ func CheckIPExists(ifName string, ip net.IP) (bool, error) {
 	return false, err
 }
 
-// Return the value of the environment variable INTERFACE_TO_ADD_SERVICE_IP or "en0"
+// Return the value of the environment variable INTERFACE_TO_ADD_SERVICE_IP or
+// "en0". This function mimicks what the Windows version of the package does.
+// XXX: There’s a function ChooseHostInterface to in
+// k8s.io/apimachinery/pkg/util/net to automatically select the right
+// interface. Unfortunately ChooseHostInterface returns a net.IP object
+// instead of the interface’s name.
 func (r *ifConfigDarwinRunner) getInterfaceToAddIP() string {
 	if iface := os.Getenv("INTERFACE_TO_ADD_SERVICE_IP"); len(iface) > 0 {
 		return iface
