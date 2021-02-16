@@ -52,10 +52,10 @@ filegroup(
         "//pkg/proxy/ipvs:all-srcs",
         "//pkg/proxy/metaproxier:all-srcs",
         "//pkg/proxy/metrics:all-srcs",
+        "//pkg/proxy/netifuserspace:all-srcs",
         "//pkg/proxy/userspace:all-srcs",
         "//pkg/proxy/util:all-srcs",
         "//pkg/proxy/winkernel:all-srcs",
-        "//pkg/proxy/winuserspace:all-srcs",
     ],
     tags = ["automanaged"],
 )

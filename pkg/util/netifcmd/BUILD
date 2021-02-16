@@ -11,8 +11,10 @@ go_library(
     srcs = [
         "doc.go",
         "netsh.go",
+        "interface.go",
+        "ifconfig.go",
     ],
-    importpath = "k8s.io/kubernetes/pkg/util/netsh",
+    importpath = "k8s.io/kubernetes/pkg/util/netifcmd",
     deps = [
         "//vendor/k8s.io/klog/v2:go_default_library",
         "//vendor/k8s.io/utils/exec:go_default_library",
@@ -30,7 +32,6 @@ filegroup(
     name = "all-srcs",
     srcs = [
         ":package-srcs",
-        "//pkg/util/netsh/testing:all-srcs",
     ],
     tags = ["automanaged"],
 )

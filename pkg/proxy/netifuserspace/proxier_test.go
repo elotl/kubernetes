@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package winuserspace
+package netifuserspace
 
 import (
 	"fmt"
@@ -35,7 +35,7 @@ import (
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/apimachinery/pkg/util/runtime"
 	"k8s.io/kubernetes/pkg/proxy"
-	netshtest "k8s.io/kubernetes/pkg/util/netsh/testing"
+	netifcmdtest "k8s.io/kubernetes/pkg/util/netifcmd/testing"
 )
 
 const (
@@ -251,7 +251,7 @@ func TestTCPProxy(t *testing.T) {
 	})
 
 	listenIP := "0.0.0.0"
-	p, err := createProxier(lb, net.ParseIP(listenIP), netshtest.NewFake(), net.ParseIP("127.0.0.1"), time.Minute, udpIdleTimeoutForTest)
+	p, err := createProxier(lb, net.ParseIP(listenIP), netifcmdtest.NewFake(), net.ParseIP("127.0.0.1"), time.Minute, udpIdleTimeoutForTest)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -278,7 +278,7 @@ func TestUDPProxy(t *testing.T) {
 	})
 
 	listenIP := "0.0.0.0"
-	p, err := createProxier(lb, net.ParseIP(listenIP), netshtest.NewFake(), net.ParseIP("127.0.0.1"), time.Minute, udpIdleTimeoutForTest)
+	p, err := createProxier(lb, net.ParseIP(listenIP), netifcmdtest.NewFake(), net.ParseIP("127.0.0.1"), time.Minute, udpIdleTimeoutForTest)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -305,7 +305,7 @@ func TestUDPProxyTimeout(t *testing.T) {
 	})
 
 	listenIP := "0.0.0.0"
-	p, err := createProxier(lb, net.ParseIP(listenIP), netshtest.NewFake(), net.ParseIP("127.0.0.1"), time.Minute, udpIdleTimeoutForTest)
+	p, err := createProxier(lb, net.ParseIP(listenIP), netifcmdtest.NewFake(), net.ParseIP("127.0.0.1"), time.Minute, udpIdleTimeoutForTest)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -344,7 +344,7 @@ func TestMultiPortProxy(t *testing.T) {
 	})
 
 	listenIP := "0.0.0.0"
-	p, err := createProxier(lb, net.ParseIP(listenIP), netshtest.NewFake(), net.ParseIP("127.0.0.1"), time.Minute, udpIdleTimeoutForTest)
+	p, err := createProxier(lb, net.ParseIP(listenIP), netifcmdtest.NewFake(), net.ParseIP("127.0.0.1"), time.Minute, udpIdleTimeoutForTest)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -374,7 +374,7 @@ func TestMultiPortOnServiceAdd(t *testing.T) {
 	serviceX := proxy.ServicePortName{NamespacedName: types.NamespacedName{Namespace: "testnamespace", Name: "echo"}, Port: "x"}
 
 	listenIP := "0.0.0.0"
-	p, err := createProxier(lb, net.ParseIP(listenIP), netshtest.NewFake(), net.ParseIP("127.0.0.1"), time.Minute, udpIdleTimeoutForTest)
+	p, err := createProxier(lb, net.ParseIP(listenIP), netifcmdtest.NewFake(), net.ParseIP("127.0.0.1"), time.Minute, udpIdleTimeoutForTest)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -440,7 +440,7 @@ func TestTCPProxyStop(t *testing.T) {
 	})
 
 	listenIP := "0.0.0.0"
-	p, err := createProxier(lb, net.ParseIP(listenIP), netshtest.NewFake(), net.ParseIP("127.0.0.1"), time.Minute, udpIdleTimeoutForTest)
+	p, err := createProxier(lb, net.ParseIP(listenIP), netifcmdtest.NewFake(), net.ParseIP("127.0.0.1"), time.Minute, udpIdleTimeoutForTest)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -484,7 +484,7 @@ func TestUDPProxyStop(t *testing.T) {
 	})
 
 	listenIP := "0.0.0.0"
-	p, err := createProxier(lb, net.ParseIP(listenIP), netshtest.NewFake(), net.ParseIP("127.0.0.1"), time.Minute, udpIdleTimeoutForTest)
+	p, err := createProxier(lb, net.ParseIP(listenIP), netifcmdtest.NewFake(), net.ParseIP("127.0.0.1"), time.Minute, udpIdleTimeoutForTest)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -522,7 +522,7 @@ func TestTCPProxyUpdateDelete(t *testing.T) {
 	})
 
 	listenIP := "0.0.0.0"
-	p, err := createProxier(lb, net.ParseIP(listenIP), netshtest.NewFake(), net.ParseIP("127.0.0.1"), time.Minute, udpIdleTimeoutForTest)
+	p, err := createProxier(lb, net.ParseIP(listenIP), netifcmdtest.NewFake(), net.ParseIP("127.0.0.1"), time.Minute, udpIdleTimeoutForTest)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -567,7 +567,7 @@ func TestUDPProxyUpdateDelete(t *testing.T) {
 	})
 
 	listenIP := "0.0.0.0"
-	p, err := createProxier(lb, net.ParseIP(listenIP), netshtest.NewFake(), net.ParseIP("127.0.0.1"), time.Minute, udpIdleTimeoutForTest)
+	p, err := createProxier(lb, net.ParseIP(listenIP), netifcmdtest.NewFake(), net.ParseIP("127.0.0.1"), time.Minute, udpIdleTimeoutForTest)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -612,7 +612,7 @@ func TestTCPProxyUpdateDeleteUpdate(t *testing.T) {
 	lb.OnEndpointsAdd(endpoint)
 
 	listenIP := "0.0.0.0"
-	p, err := createProxier(lb, net.ParseIP(listenIP), netshtest.NewFake(), net.ParseIP("127.0.0.1"), time.Minute, udpIdleTimeoutForTest)
+	p, err := createProxier(lb, net.ParseIP(listenIP), netifcmdtest.NewFake(), net.ParseIP("127.0.0.1"), time.Minute, udpIdleTimeoutForTest)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -674,7 +674,7 @@ func TestUDPProxyUpdateDeleteUpdate(t *testing.T) {
 	lb.OnEndpointsAdd(endpoint)
 
 	listenIP := "0.0.0.0"
-	p, err := createProxier(lb, net.ParseIP(listenIP), netshtest.NewFake(), net.ParseIP("127.0.0.1"), time.Minute, udpIdleTimeoutForTest)
+	p, err := createProxier(lb, net.ParseIP(listenIP), netifcmdtest.NewFake(), net.ParseIP("127.0.0.1"), time.Minute, udpIdleTimeoutForTest)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -735,7 +735,7 @@ func TestTCPProxyUpdatePort(t *testing.T) {
 	})
 
 	listenIP := "0.0.0.0"
-	p, err := createProxier(lb, net.ParseIP(listenIP), netshtest.NewFake(), net.ParseIP("127.0.0.1"), time.Minute, udpIdleTimeoutForTest)
+	p, err := createProxier(lb, net.ParseIP(listenIP), netifcmdtest.NewFake(), net.ParseIP("127.0.0.1"), time.Minute, udpIdleTimeoutForTest)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -783,7 +783,7 @@ func TestUDPProxyUpdatePort(t *testing.T) {
 	})
 
 	listenIP := "0.0.0.0"
-	p, err := createProxier(lb, net.ParseIP(listenIP), netshtest.NewFake(), net.ParseIP("127.0.0.1"), time.Minute, udpIdleTimeoutForTest)
+	p, err := createProxier(lb, net.ParseIP(listenIP), netifcmdtest.NewFake(), net.ParseIP("127.0.0.1"), time.Minute, udpIdleTimeoutForTest)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -828,7 +828,7 @@ func TestProxyUpdatePublicIPs(t *testing.T) {
 	})
 
 	listenIP := "0.0.0.0"
-	p, err := createProxier(lb, net.ParseIP(listenIP), netshtest.NewFake(), net.ParseIP("127.0.0.1"), time.Minute, udpIdleTimeoutForTest)
+	p, err := createProxier(lb, net.ParseIP(listenIP), netifcmdtest.NewFake(), net.ParseIP("127.0.0.1"), time.Minute, udpIdleTimeoutForTest)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -881,7 +881,7 @@ func TestProxyUpdatePortal(t *testing.T) {
 	lb.OnEndpointsAdd(endpoint)
 
 	listenIP := "0.0.0.0"
-	p, err := createProxier(lb, net.ParseIP(listenIP), netshtest.NewFake(), net.ParseIP("127.0.0.1"), time.Minute, udpIdleTimeoutForTest)
+	p, err := createProxier(lb, net.ParseIP(listenIP), netifcmdtest.NewFake(), net.ParseIP("127.0.0.1"), time.Minute, udpIdleTimeoutForTest)
 	if err != nil {
 		t.Fatal(err)
 	}
