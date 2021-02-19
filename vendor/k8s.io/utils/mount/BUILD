@@ -6,6 +6,7 @@ go_library(
         "doc.go",
         "fake_mounter.go",
         "mount.go",
+        "mount_darwin.go",
         "mount_helper_common.go",
         "mount_helper_unix.go",
         "mount_helper_windows.go",
