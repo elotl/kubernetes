@@ -1,4 +1,4 @@
-// +build !linux,!windows,!darwin
+// +build darwin
 
 /*
 Copyright 2014 The Kubernetes Authors.
@@ -22,6 +22,7 @@ import (
 	"errors"
 	"os"
 
+	"k8s.io/klog"
 	"k8s.io/utils/mount"
 	"k8s.io/utils/nsenter"
 )
@@ -46,7 +47,8 @@ func (sp *subpath) PrepareSafeSubpath(subPath Subpath) (newHostPath string, clea
 }
 
 func (sp *subpath) CleanSubPaths(podDir string, volumeName string) error {
-	return errUnsupported
+	klog.V(2).Infof("CleanSubPaths %s %s", podDir, volumeName)
+	return nil
 }
 
 func (sp *subpath) SafeMakeDir(pathname string, base string, perm os.FileMode) error {
