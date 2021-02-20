@@ -38,6 +38,9 @@ NODE_PLATFORMS = {
     "windows": [
         "amd64",
     ],
+    "darwin": [
+        "amd64",
+    ]
 }
 
 # KUBE_CLIENT_PLATFORMS in hack/lib/golang.sh
