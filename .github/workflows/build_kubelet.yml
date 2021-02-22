@@ -20,7 +20,7 @@ jobs:
       - name: Build binary
         run: |
           export PATH=$PATH:$(go env GOPATH)/bin
-          KUBE_BUILD_PLATFORMS=darwin/amd64 make WHAT=cmd/kubelet
+          env KUBE_BUILD_PLATFORMS=darwin/amd64 make WHAT=cmd/kubelet
       - name: Upload kubelet to s3
         uses: ItsKarma/aws-cli@v1.70.0
         with:
