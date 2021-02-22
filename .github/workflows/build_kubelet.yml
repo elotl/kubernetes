@@ -1,0 +1,31 @@
+on:
+  push:
+    branches:
+      - kubelet
+      - vilmos-darwin-cadvisor
+name: Build and test
+jobs:
+  build:
+    runs-on: macos-latest
+    steps:
+      - name: Install Go
+        uses: actions/setup-go@v1
+        with:
+          go-version: 1.13.x
+      - name: Checkout code
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: '0'
+      - run: git fetch origin +refs/tags/*:refs/tags/*
+      - name: Build binary
+        run: |
+          export PATH=$PATH:$(go env GOPATH)/bin
+          make WHAT=cmd/kubelet
+      - name: Upload kubelet to s3
+        uses: shallwefootball/s3-upload-action@master
+        with:
+          aws_key_id: ${{ secrets.AWS_KEY_ID }}
+          aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY}}
+          aws_bucket: ${{ secrets.AWS_BUCKET }}
+          source_dir: '_output/bin/kubelet'
+          destination_dir: "kubelet"-${{ env.GITHUB_RUN_ID }}
