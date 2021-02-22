@@ -22,10 +22,10 @@ jobs:
           export PATH=$PATH:$(go env GOPATH)/bin
           make WHAT=cmd/kubelet
       - name: Upload kubelet to s3
-        uses: shallwefootball/s3-upload-action@master
+        uses: ItsKarma/aws-cli@v1.70.0
         with:
-          aws_key_id: ${{ secrets.ECR_AWS_ACCESS_KEY_ID }}
-          aws_secret_access_key: ${{ secrets.ECR_AWS_SECRET_ACCESS_KEY }}
-          aws_bucket: ${{ secrets.AWS_BUCKET }}
-          destination_dir: kubelet-${{ env.GITHUB_RUN_ID }}
-          source_dir: '_output/bin/kubelet'
+          args: s3 cp --acl public-read _output/bin/kubelet s3://${{ secrets.AWS_BUCKET }}/kubelet-${{ env.GITHUB_RUN_ID }}
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.ECR_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.ECR_AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: "us-east-1"
