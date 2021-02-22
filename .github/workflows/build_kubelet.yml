@@ -24,10 +24,13 @@ jobs:
         env:
           KUBE_BUILD_PLATFORMS: "darwin/amd64"
       - name: Upload kubelet to s3
-        uses: ItsKarma/aws-cli@v1.70.0
-        with:
-          args: s3 cp --acl public-read ./_output/bin/kubelet s3://${{ secrets.AWS_BUCKET }}/kubelet-${{ env.GITHUB_RUN_ID }}
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.ECR_AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.ECR_AWS_SECRET_ACCESS_KEY }}
           AWS_DEFAULT_REGION: "us-east-1"
+        run: |
+          curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+          unzip awscliv2.zip
+          sudo ./aws/install
+          aws --version
+          aws s3 cp --acl public-read _output/bin/kubelet s3://procri-dev/kubelet-$GITHUB_RUN_ID
