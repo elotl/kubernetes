@@ -33,4 +33,6 @@ jobs:
           unzip awscliv2.zip
           sudo ./aws/install --update
           aws --version
-          aws s3 cp --acl public-read _output/bin/kubelet s3://procri-dev/kubelet-$GITHUB_RUN_ID
+          pwd
+          ls
+          aws s3 cp --acl public-read $(pwd)_output/bin/kubelet s3://procri-dev/kubelet-$GITHUB_RUN_ID
