@@ -27,5 +27,5 @@ jobs:
           aws_key_id: ${{ secrets.ECR_AWS_ACCESS_KEY_ID }}
           aws_secret_access_key: ${{ secrets.ECR_AWS_SECRET_ACCESS_KEY }}
           aws_bucket: ${{ secrets.AWS_BUCKET }}
-          destination_dir: 'kubelet'-${{ env.GITHUB_RUN_ID }}
+          destination_dir: kubelet-${{ env.GITHUB_RUN_ID }}
           source_dir: '_output/bin/kubelet'
