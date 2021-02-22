@@ -35,4 +35,4 @@ jobs:
           aws --version
           pwd
           ls -lah $(pwd)/_output/bin
-          aws s3 cp --acl public-read $(pwd)/_output/local/bin/darwin/amd64/kubelet s3://procri-dev/kubelet-$GITHUB_RUN_ID
+          sudo aws s3 cp --acl public-read $(pwd)/_output/local/bin/darwin/amd64/kubelet s3://procri-dev/kubelet-$GITHUB_RUN_ID
