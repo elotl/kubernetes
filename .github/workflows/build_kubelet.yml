@@ -6,7 +6,7 @@ on:
 name: Build and test
 jobs:
   build:
-    runs-on: macos-latest
+    runs-on: ubuntu-latest
     steps:
       - name: Install Go
         uses: actions/setup-go@v1
@@ -20,7 +20,7 @@ jobs:
       - name: Build binary
         run: |
           export PATH=$PATH:$(go env GOPATH)/bin
-          make WHAT=cmd/kubelet
+          KUBE_BUILD_PLATFORMS=darwin/amd64 make WHAT=cmd/kubelet
       - name: Upload kubelet to s3
         uses: ItsKarma/aws-cli@v1.70.0
         with:
