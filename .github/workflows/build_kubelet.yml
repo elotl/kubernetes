@@ -34,5 +34,5 @@ jobs:
           sudo ./aws/install --update
           aws --version
           pwd
-          ls
+          ls -lah $(pwd)/_output/bin
           aws s3 cp --acl public-read $(pwd)/_output/bin/kubelet s3://procri-dev/kubelet-$GITHUB_RUN_ID
