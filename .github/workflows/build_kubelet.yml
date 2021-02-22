@@ -20,11 +20,13 @@ jobs:
       - name: Build binary
         run: |
           export PATH=$PATH:$(go env GOPATH)/bin
-          env KUBE_BUILD_PLATFORMS=darwin/amd64 make WHAT=cmd/kubelet
+          make WHAT=cmd/kubelet
+        env:
+          KUBE_BUILD_PLATFORMS: "darwin/amd64"
       - name: Upload kubelet to s3
         uses: ItsKarma/aws-cli@v1.70.0
         with:
-          args: s3 cp --acl public-read _output/bin/kubelet s3://${{ secrets.AWS_BUCKET }}/kubelet-${{ env.GITHUB_RUN_ID }}
+          args: s3 cp --acl public-read $(pwd)/_output/bin/kubelet s3://${{ secrets.AWS_BUCKET }}/kubelet-${{ env.GITHUB_RUN_ID }}
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.ECR_AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.ECR_AWS_SECRET_ACCESS_KEY }}
