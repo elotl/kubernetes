@@ -3,7 +3,7 @@ on:
     branches:
       - kubelet
       - vilmos-darwin-cadvisor
-name: Build and test
+name: Build and upload
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -31,7 +31,7 @@ jobs:
       - name: Upload to s3
         uses: docker://amazon/aws-cli:latest
         with:
-          args: s3 cp --acl public-read _output/local/darwin/amd64/kubelet s3://${{ env.DEV_BUCKET }}/kubelet-${{ env.VERSION }}
+          args: s3 cp --acl public-read _output/local/bin/darwin/amd64/kubelet s3://${{ env.DEV_BUCKET }}/kubelet-${{ env.VERSION }}
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.TF_AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.TF_AWS_SECRET_ACCESS_KEY }}
