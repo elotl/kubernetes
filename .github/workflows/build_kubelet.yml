@@ -20,7 +20,7 @@ jobs:
       - name: Build binary
         run: |
           export PATH=$PATH:$(go env GOPATH)/bin
-          make WHAT=cmd/kubelet
+          make cross WHAT=cmd/kubelet
         env:
           KUBE_BUILD_PLATFORMS: "darwin/amd64"
           GOARCH: "amd64"
