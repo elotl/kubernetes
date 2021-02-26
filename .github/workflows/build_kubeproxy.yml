@@ -1,0 +1,38 @@
+on:
+  push:
+    branches:
+      - elotl/master
+name: Build and upload
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install Go
+        uses: actions/setup-go@v1
+        with:
+          go-version: 1.13.x
+      - name: Checkout code
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: '0'
+      - run: git fetch origin +refs/tags/*:refs/tags/*
+      - name: Build binary
+        run: |
+          export PATH=$PATH:$(go env GOPATH)/bin
+          make cross KUBE_BUILD_PLATFORMS=darwin/amd64 WHAT=cmd/kube-proxy
+        env:
+          GOARCH: "amd64"
+          GOOS: "darwin"
+      - name: Set VERSION
+        id: set_version
+        run: echo ::set-output name=VERSION::$(git describe --dirty)
+      - name: Upload to s3
+        uses: docker://amazon/aws-cli:latest
+        with:
+          args: s3 cp --acl public-read _output/local/bin/darwin/amd64/kube-proxy s3://${{ env.DEV_BUCKET }}/kube-proxy-${{ env.VERSION }}
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.TF_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.TF_AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: "us-east-1"
+          VERSION: ${{ steps.set_version.outputs.VERSION }}
+          DEV_BUCKET: "elotl-maccri"
