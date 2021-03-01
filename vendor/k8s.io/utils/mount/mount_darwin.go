@@ -94,7 +94,7 @@ func (mounter *Mounter) doMount(mounterPath string, mountCmd string, source stri
 		if err != nil {
 			return fmt.Errorf("new_hfs %s: %s %v", source, string(out), err)
 		}
-		klog.V(2).Infof("using %s %s for tmpfs")
+		klog.V(2).Infof("using %s %s for tmpfs", source, out)
 	}
 
 	mountArgs, mountArgsLogStr := MakeMountArgsSensitive(source, target, fstype, options, sensitiveOptions)
@@ -113,6 +113,14 @@ func (mounter *Mounter) doMount(mounterPath string, mountCmd string, source stri
 		return fmt.Errorf("mount failed: %v\nMounting command: %s\nMounting arguments: %s\nOutput: %s",
 			err, mountCmd, mountArgsLogStr, string(output))
 	}
+	// add .metadata_never_index file to prevent mds opening files on this volume
+	touchCmd := exec.Command("touch", filepath.Join(target, ".metadata_never_index"))
+	output, err = touchCmd.CombinedOutput()
+	if err != nil {
+		klog.Warningf("cannot create .metadata_never_index on %s : %v", target, err)
+		err = nil
+	}
+
 	return err
 }
 
