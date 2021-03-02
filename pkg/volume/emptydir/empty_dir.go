@@ -19,6 +19,7 @@ package emptydir
 import (
 	"fmt"
 	"os"
+	"os/exec"
 	"path/filepath"
 
 	"k8s.io/klog"
@@ -467,6 +468,15 @@ func (ed *emptyDir) teardownDefault(dir string) error {
 	err := fsquota.ClearQuota(ed.mounter, dir)
 	if err != nil {
 		klog.Warningf("Warning: Failed to clear quota on %s: %v", dir, err)
+	}
+	// diskutil eraseVolume
+	// "A pseudo-format of "free" or "Free Space" will
+	// remove the partition altogether, leaving a free space gap in the partition map."
+	cmd := exec.Command("diskutil", "eraseVolume", "free", "free", dir)
+	_, err = cmd.CombinedOutput()
+	if err != nil {
+		klog.Warningf("error erasing volume %s : %v", dir, err)
+		err = nil
 	}
 	// Renaming the directory is not required anymore because the operation executor
 	// now handles duplicate operations on the same volume
