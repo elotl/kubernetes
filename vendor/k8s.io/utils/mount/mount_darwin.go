@@ -185,6 +185,14 @@ func (mounter *Mounter) Unmount(target string) error {
 	if err != nil {
 		return fmt.Errorf("unmount failed: %v\nUnmounting arguments: %s\nOutput: %s", err, target, string(output))
 	}
+	// diskutil eraseVolume
+	// "A pseudo-format of "free" or "Free Space" will
+	// remove the partition altogether, leaving a free space gap in the partition map."
+	cmd := exec.Command("diskutil", "eraseVolume", "free", "free", target)
+	output, err = cmd.CombinedOutput()
+	if err != nil {
+		return fmt.Errorf("error erasing volume %s : %v", target, err)
+	}
 	return nil
 }
 
