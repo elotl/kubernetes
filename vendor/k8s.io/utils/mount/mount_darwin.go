@@ -180,7 +180,7 @@ func (mounter *Mounter) Unmount(target string) error {
 		}
 	}
 
-	command := exec.Command("umount", target)
+	command := exec.Command("diskutil", "umount", target)
 	output, err := command.CombinedOutput()
 	if err != nil {
 		return fmt.Errorf("unmount failed: %v\nUnmounting arguments: %s\nOutput: %s", err, target, string(output))
