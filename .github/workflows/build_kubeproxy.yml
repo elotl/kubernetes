@@ -18,7 +18,7 @@ jobs:
       - run: git fetch origin +refs/tags/*:refs/tags/*
       - name: Build binary
         run: |
-          KUBE_BUILD_PLATFORMS=darwin/amd64 make WHAT=cmd/kube-proxy cross
+          KUBE_BUILD_PLATFORMS=darwin/amd64 make WHAT=cmd/kube-proxy
       - name: Set VERSION
         id: set_version
         run: echo ::set-output name=VERSION::$(git describe --dirty)

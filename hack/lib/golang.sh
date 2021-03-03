@@ -37,6 +37,7 @@ readonly KUBE_SUPPORTED_NODE_PLATFORMS=(
   linux/s390x
   linux/ppc64le
   windows/amd64
+  darwin/amd64
 )
 
 # If we update this we should also update the set of platforms whose standard
