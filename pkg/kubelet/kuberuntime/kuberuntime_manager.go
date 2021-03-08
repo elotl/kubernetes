@@ -58,7 +58,7 @@ const (
 	// The api version of kubelet runtime api
 	kubeRuntimeAPIVersion = "0.1.0"
 	// The root directory for pod logs
-	podLogsRootDirectory = "/var/log/pods"
+	podLogsRootDirectory = "/System/Volumes/Data/Users/Shared/log/pods"
 	// A minimal shutdown window for avoiding unnecessary SIGKILLs
 	minimumGracePeriodInSeconds = 2
 
